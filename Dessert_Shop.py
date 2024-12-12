@@ -1,51 +1,127 @@
-from Dessert import Candy, Cookie, IceCream, Sundae, Order
+
+from Dessert import Candy, Cookie, IceCream, Sundae
 from receipt import make_receipt
 
+class DessertShop:
+    def user_prompt_candy(self):
+        """Prompt the user to enter details for a Candy item."""
+        name = input("Enter the type of candy: ")
+        while True:
+            try:
+                weight = float(input("Enter the weight (in pounds): "))
+                if weight <= 0:
+                    raise ValueError
+                break
+            except ValueError:
+                print("Please enter a valid positive number for weight.")
+
+        while True:
+            try:
+                price_per_pound = float(input("Enter the price per pound: "))
+                if price_per_pound <= 0:
+                    raise ValueError
+                break
+            except ValueError:
+                print("Please enter a valid positive number for price per pound.")
+
+        return Candy(name, weight, price_per_pound)
+
+    def user_prompt_cookie(self):
+        """Prompt the user to enter details for a Cookie item."""
+        name = input("Enter the type of cookie: ")
+        while True:
+            try:
+                quantity = int(input("Enter the quantity purchased: "))
+                if quantity <= 0:
+                    raise ValueError
+                break
+            except ValueError:
+                print("Please enter a valid positive integer for quantity.")
+
+        while True:
+            try:
+                price_per_dozen = float(input("Enter the price per dozen: "))
+                if price_per_dozen <= 0:
+                    raise ValueError
+                break
+            except ValueError:
+                print("Please enter a valid positive number for price per dozen.")
+
+        return Cookie(name, quantity, price_per_dozen)
+
+    def user_prompt_icecream(self):
+        """Prompt the user to enter details for an IceCream item."""
+        name = input("Enter the type of ice cream: ")
+        while True:
+            try:
+                scoops = int(input("Enter the number of scoops: "))
+                if scoops <= 0:
+                    raise ValueError
+                break
+            except ValueError:
+                print("Please enter a valid positive integer for the number of scoops.")
+
+        while True:
+            try:
+                price_per_scoop = float(input("Enter the price per scoop: "))
+                if price_per_scoop <= 0:
+                    raise ValueError
+                break
+            except ValueError:
+                print("Please enter a valid positive number for price per scoop.")
+
+        return IceCream(name, scoops, price_per_scoop)
+
+    def user_prompt_sundae(self):
+        """Prompt the user to enter details for a Sundae item."""
+        base_ice_cream = self.user_prompt_icecream()
+        topping_name = input("Enter the topping: ")
+        while True:
+            try:
+                topping_price = float(input("Enter the price for the topping: "))
+                if topping_price < 0:
+                    raise ValueError
+                break
+            except ValueError:
+                print("Please enter a valid positive number for topping price.")
+
+        return Sundae(base_ice_cream.name, base_ice_cream.scoops, base_ice_cream.price_per_scoop, topping_name, topping_price)
+
+
 def main():
-    order = Order()
+    shop = DessertShop()
+    order = []
 
-    while True:
-        print("\nChoose a dessert to add to your order:")
-        print("1. Candy")
-        print("2. Cookie")
-        print("3. Ice Cream")
-        print("4. Sundae")
-        print("5. Finish")
+    print("\nEnter the quantities for each item type. If you don't want an item, enter 0.")
 
-        choice = input("Enter your choice (1-5): ")
+    try:
+        candy_qty = int(input("How many types of candy? "))
+        for _ in range(candy_qty):
+            order.append(shop.user_prompt_candy())
 
-        if choice == '1':
-            name = input("Enter candy name: ")
-            weight = float(input("Enter weight in pounds: "))
-            price_per_pound = float(input("Enter price per pound: "))
-            order.add(Candy(name, weight, price_per_pound))
-        elif choice == '2':
-            name = input("Enter cookie name: ")
-            quantity = int(input("Enter quantity: "))
-            price_per_dozen = float(input("Enter price per dozen: "))
-            order.add(Cookie(name, quantity, price_per_dozen))
-        elif choice == '3':
-            name = input("Enter ice cream flavor: ")
-            scoops = int(input("Enter number of scoops: "))
-            price_per_scoop = float(input("Enter price per scoop: "))
-            order.add(IceCream(name, scoops, price_per_scoop))
-        elif choice == '4':
-            name = input("Enter sundae flavor: ")
-            scoops = int(input("Enter number of scoops: "))
-            price_per_scoop = float(input("Enter price per scoop: "))
-            topping_name = input("Enter topping name: ")
-            topping_price = float(input("Enter topping price: "))
-            order.add(Sundae(name, scoops, price_per_scoop, topping_name, topping_price))
-        elif choice == '5':
-            break
-        else:
-            print("Invalid choice, please try again.")
+        cookie_qty = int(input("How many types of cookies? "))
+        for _ in range(cookie_qty):
+            order.append(shop.user_prompt_cookie())
+
+        icecream_qty = int(input("How many types of ice cream? "))
+        for _ in range(icecream_qty):
+            order.append(shop.user_prompt_icecream())
+
+        sundae_qty = int(input("How many types of sundaes? "))
+        for _ in range(sundae_qty):
+            order.append(shop.user_prompt_sundae())
+
+    except ValueError:
+        print("Invalid input. Please restart and provide valid quantities.")
+        return
 
     data = [["Name", "Item Cost", "Tax"]]
-    for item in order.order:
+    for item in order:
         data.append([item.name, f"${item.calculate_cost():.2f}", f"${item.calculate_tax():.2f}"])
-    data.append(["Order Subtotals", f"${order.order_cost():.2f}", f"${order.order_tax():.2f}"])
-    data.append(["Order Total", "", f"${order.order_cost() + order.order_tax():.2f}"])
+    subtotal = sum(item.calculate_cost() for item in order)
+    tax = sum(item.calculate_tax() for item in order)
+    data.append(["Order Subtotals", f"${subtotal:.2f}", f"${tax:.2f}"])
+    data.append(["Order Total", "", f"${subtotal + tax:.2f}"])
     data.append(["Total items in the order", "", len(order)])
 
     make_receipt(data, "receipt.pdf")
