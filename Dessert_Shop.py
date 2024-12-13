@@ -123,7 +123,7 @@ def main():
     data.append(["Order Total", "", f"${subtotal + tax:.2f}"])
     data.append(["Total items in the order", "", len(order)])
 
-    make_receipt(data, "receipt.pdf")
+    make_receipt.build(data, "receipt.pdf")
     print("\nReceipt has been generated as 'receipt.pdf'.")
 
 
