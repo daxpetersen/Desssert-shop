@@ -4,7 +4,7 @@ from receipt import make_receipt
 
 class DessertShop:
     def user_prompt_candy(self):
-        name = "Candy"
+        name = input("Enter the name of the candy: ")
         while True:
             try:
                 weight = float(input("Enter the weight (in pounds): "))
@@ -23,10 +23,12 @@ class DessertShop:
             except ValueError:
                 print("Please enter a valid positive number for price per pound.")
 
-        return Candy(name, weight, price_per_pound)
+        candy = Candy(name, weight, price_per_pound)
+        candy.packaging = "Bag"  # Set the default packaging
+        return candy
 
     def user_prompt_cookie(self):
-        name = "Cookie"
+        name = input("Enter the name of the cookie: ")
         while True:
             try:
                 quantity = int(input("Enter the quantity purchased: "))
@@ -45,10 +47,12 @@ class DessertShop:
             except ValueError:
                 print("Please enter a valid positive number for price per dozen.")
 
-        return Cookie(name, quantity, price_per_dozen)
+        cookie = Cookie(name, quantity, price_per_dozen)
+        cookie.packaging = "Box"  # Set the default packaging
+        return cookie
 
     def user_prompt_icecream(self):
-        name = "IceCream"
+        name = input("Enter the name of the ice cream: ")
         while True:
             try:
                 scoops = int(input("Enter the number of scoops: "))
@@ -67,10 +71,30 @@ class DessertShop:
             except ValueError:
                 print("Please enter a valid positive number for price per scoop.")
 
-        return IceCream(name, scoops, price_per_scoop)
+        ice_cream = IceCream(name, scoops, price_per_scoop)
+        ice_cream.packaging = "Bowl"  # Set the default packaging
+        return ice_cream
 
     def user_prompt_sundae(self):
-        base_ice_cream = self.user_prompt_icecream()
+        name = input("Enter the name of the sundae: ")
+        while True:
+            try:
+                scoops = int(input("Enter the number of scoops: "))
+                if scoops <= 0:
+                    raise ValueError
+                break
+            except ValueError:
+                print("Please enter a valid positive integer for the number of scoops.")
+
+        while True:
+            try:
+                price_per_scoop = float(input("Enter the price per scoop: "))
+                if price_per_scoop <= 0:
+                    raise ValueError
+                break
+            except ValueError:
+                print("Please enter a valid positive number for price per scoop.")
+
         topping_name = input("Enter the topping: ")
         while True:
             try:
@@ -81,12 +105,14 @@ class DessertShop:
             except ValueError:
                 print("Please enter a valid positive number for topping price.")
 
-        return Sundae(base_ice_cream.name, base_ice_cream.scoops, base_ice_cream.price_per_scoop, topping_name, topping_price)
+        sundae = Sundae(name, scoops, price_per_scoop, topping_name, topping_price)
+        sundae.packaging = "Boat"  # Set the default packaging
+        return sundae
 
 
 def main():
     shop = DessertShop()
-    order = Order()  
+    order = Order()
 
     print("\nEnter the quantities for each item type. If you don't want an item, enter 0.")
 
@@ -114,14 +140,16 @@ def main():
     print("\nReceipt:")
     print(order)
 
-    data = [["Name", "Item Cost", "Tax"]]
-    for item in order.order: 
-        data.append([item.name, f"${item.calculate_cost():.2f}", f"${item.calculate_tax():.2f}"])
+    data = [["Name", "Packaging", "Item Cost", "Tax"]]
+    for item in order.order:
+        data.append(
+            [item.name, item.packaging, f"${item.calculate_cost():.2f}", f"${item.calculate_tax():.2f}"]
+        )
     subtotal = order.order_cost()
     tax = order.order_tax()
-    data.append(["Order Subtotals", f"${subtotal:.2f}", f"${tax:.2f}"])
-    data.append(["Order Total", "", f"${subtotal + tax:.2f}"])
-    data.append(["Total items in the order", "", len(order)])
+    data.append(["Order Subtotals", "", f"${subtotal:.2f}", f"${tax:.2f}"])
+    data.append(["Order Total", "", "", f"${subtotal + tax:.2f}"])
+    data.append(["Total items in the order", "", "", len(order)])
 
     make_receipt.build(data, "receipt.pdf")
     print("\nReceipt has been generated as 'receipt.pdf'.")
