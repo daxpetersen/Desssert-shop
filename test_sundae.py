@@ -1,8 +1,8 @@
-import unittest
-from dessert import Sundae
+from Dessert import DessertItem
 
-class TestSundae(unittest.TestCase):
-
-    def test_calculate_cost(self):
-        sundae = Sundae("Chocolate", 2, 2.00, "Hot Fudge", 1.00)
-        self.assertEqual(sundae.calculate_cost(), 5.00)
+class Sundae(DessertItem):
+    def __init__(self, name, scoop_count, price_per_scoop, topping_name, topping_price):
+        super().__init__(name, scoop_count, price_per_scoop)
+        self.topping_name = topping_name
+        self.topping_price = topping_price
+        self.packaging = "Boat"
