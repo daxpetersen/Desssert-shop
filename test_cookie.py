@@ -1,8 +1,7 @@
-import unittest
-from dessert import Cookie
-
-class TestCookie(unittest.TestCase):
-
-    def test_calculate_cost(self):
-        cookie = Cookie("Chocolate Chip", 12, 2.50)
-        self.assertEqual(cookie.calculate_cost(), 2.50)
+from Dessert import DessertItem
+class Cookie(DessertItem):
+    def __init__(self, name, number, price_per_dozen):
+        super().__init__(name)
+        self.number = number
+        self.price_per_dozen = price_per_dozen
+        self.packaging = "Box"
